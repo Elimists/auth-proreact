@@ -32,7 +32,7 @@ func main() {
 	app.Static("/", "./public")
 
 	var corsConfig cors.Config
-	if os.Getenv("ENVIRONMENT") == "production" {
+	if os.Getenv("ENVIRONMENT") == "production" || os.Getenv("ENVIRONMENT") == "staging" {
 		corsConfig = cors.Config{
 			AllowCredentials: true,
 			AllowOrigins:     "http://localhost:3000", // Restrict to localhost:3000 in production
