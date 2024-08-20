@@ -1,0 +1,8 @@
+# ignore all .txt files
+*.txt
+uploads
+app
+*.mod
+.env.local
+.env.production
+.env
