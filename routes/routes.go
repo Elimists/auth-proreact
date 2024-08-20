@@ -8,10 +8,6 @@ import (
 
 func AllRoutes(app *fiber.App) {
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendFile("./public/html/home.html")
-	})
-
 	// Auth routes
 	app.Get("/verify/:email/:verificationCode", controller.VerifyEmail)
 	app.Post("/register", middleware.Limiter(14, 60), controller.Register)
