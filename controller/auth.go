@@ -26,10 +26,6 @@ import (
 
 var emailQueue = channels.NewInfiniteChannel()
 
-func ShowRegistrationForm(c *fiber.Ctx) error {
-	return c.Render("./public/html/auth/registration.html", nil)
-}
-
 // Register a new user.
 //
 // @Summary Register a new user.
@@ -47,9 +43,7 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotAcceptable).JSON(rp)
 	}
 
-	decodedEmail, _ := base64.StdEncoding.DecodeString(data["email"])
-
-	if !emailIsValid(string(decodedEmail)) {
+	if !emailIsValid(string(data["email"])) {
 		rp := models.ResponsePacket{Error: true, Code: "invalid_email", Message: "Email is not valid."}
 		return c.Status(fiber.StatusNotAcceptable).JSON(rp)
 	}
@@ -67,7 +61,7 @@ func Register(c *fiber.Ctx) error {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 12)
 	verificationCode := generateVerificationCode()
 	auth := models.User{
-		Email:     string(decodedEmail),
+		Email:     string(data["email"]),
 		Password:  hashedPassword,
 		Privilege: 9, // General user.
 		Verified:  false,
@@ -148,16 +142,14 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotAcceptable).JSON(rp)
 	}
 
-	csrfToken := c.Cookies("custom_app_csrf")
+	if err := bcrypt.CompareHashAndPassword(auth.Password, []byte(data["password"])); err != nil {
+		rp := models.ResponsePacket{Error: true, Code: "incorrect_password", Message: "Password is not correct"}
+		return c.Status(fiber.StatusBadRequest).JSON(rp)
+	}
 
 	expiry := jwt.NewNumericDate(time.Now().Add(24 * time.Hour))
 	if data["longerlogin"] == "true" {
 		expiry = jwt.NewNumericDate(time.Now().Add(240 * time.Hour))
-	}
-
-	if err := bcrypt.CompareHashAndPassword(auth.Password, []byte(data["password"])); err != nil {
-		rp := models.ResponsePacket{Error: true, Code: "incorrect_password", Message: "Password is not correct"}
-		return c.Status(fiber.StatusBadRequest).JSON(rp)
 	}
 
 	claims := jwt.MapClaims{
@@ -177,25 +169,35 @@ func Login(c *fiber.Ctx) error {
 
 	database.DB.Model(&auth).Where("email = ?", data["email"]).Update("updated_at", time.Now()) // update the last logged in datetime
 
-	c.Append(fmt.Sprintf("X-%s-JWT-Token", os.Getenv("API_NAME")), signedToken)
-
 	c.Cookie(&fiber.Cookie{
-		Name:     fmt.Sprintf("%s_csrf", os.Getenv("API_NAME")),
-		Value:    csrfToken,
+		Name:     fmt.Sprintf("%s_jwt", os.Getenv("API_NAME")),
+		Value:    signedToken,
 		Expires:  expiry.Time,
 		SameSite: "Lax",
 	})
-	c.Set(fmt.Sprintf("X-%s-CSRF-Token", os.Getenv("API_NAME")), csrfToken)
 
 	rp := models.ResponsePacket{Error: false, Code: "successfull", Message: "Login successfull"}
 	return c.Status(fiber.StatusOK).JSON(rp)
 }
 
+func GetLoginCSRFToken(c *fiber.Ctx) error {
+	csrfToken := c.Cookies("custom_app_csrf") // Get the CSRF token from the cookie
+	c.Set(fmt.Sprintf("X-%s-CSRF-Token", os.Getenv("API_NAME")), csrfToken)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "CSRF token sent."})
+}
+
 func Logout(c *fiber.Ctx) error {
 
-	c.ClearCookie("custom_app_jwt_token")
+	c.Cookie(&fiber.Cookie{
+		Name:     fmt.Sprintf("%s_jwt", os.Getenv("API_NAME")),
+		Value:    "",
+		Expires:  time.Now().Add(-time.Hour),
+		SameSite: "Lax",
+	})
 
-	rp := models.ResponsePacket{Error: false, Code: "successfull", Message: "Logout successfull"}
+	c.Set(fmt.Sprintf("X-%s-JWT", os.Getenv("API_NAME")), "")
+
+	rp := models.ResponsePacket{Error: false, Code: "successfull", Message: "Logged out successfully."}
 	return c.Status(fiber.StatusOK).JSON(rp)
 }
 
