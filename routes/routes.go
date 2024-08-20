@@ -12,11 +12,11 @@ func AllRoutes(app *fiber.App) {
 	app.Get("/verify/:email/:verificationCode", controller.VerifyEmail)
 	app.Post("/register", middleware.Limiter(14, 60), controller.Register)
 
+	app.Get("/login", middleware.Limiter(6, 45), controller.GetLoginCSRFToken)
 	app.Post("/login", middleware.Limiter(6, 45), controller.Login)
 	app.Post("/logout", middleware.Limiter(6, 45), controller.Logout)
 
 	app.Post("/resetpassword", middleware.Limiter(6, 45), controller.ResetPassword)
-	app.Post("/updatepassword", middleware.Protected(), middleware.Limiter(6, 45), controller.UpdatePassword)
 
 	// User routes
 	app.Get("/users/:id", middleware.Protected(), middleware.Limiter(6, 60), controller.GetUser)
@@ -26,5 +26,6 @@ func AllRoutes(app *fiber.App) {
 	app.Post("/users/:id/address", middleware.Protected(), controller.AddAddress)
 	app.Patch("/users/:id/address/:id", middleware.Protected(), controller.UpdateAddress)
 	app.Delete("/users/:id/address/:id", middleware.Protected(), controller.DeleteAddress)
+	app.Post("/updatepassword", middleware.Protected(), middleware.Limiter(6, 45), controller.UpdatePassword)
 
 }
