@@ -6,3 +6,4 @@ app
 .env.local
 .env.production
 .env
+*.db
