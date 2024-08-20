@@ -25,7 +25,7 @@ func init() {
 	}
 
 	database.Connect()
-	go controller.EmailVerificationWorker()
+	go controller.EmailVerificationWorker() // Start the email verification worker
 }
 
 func main() {
