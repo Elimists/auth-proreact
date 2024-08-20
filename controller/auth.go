@@ -159,8 +159,8 @@ func Login(c *fiber.Ctx) error {
 		"privilege": auth.Privilege,
 		"exp":       expiry,
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	signedToken, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	signedToken, err := token.SignedString(privateKey)
 
 	if err != nil {
 		rp := models.ResponsePacket{Error: true, Code: "internal_error", Message: "Could not sign token."}

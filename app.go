@@ -14,6 +14,9 @@ import (
 )
 
 func init() {
+
+	controller.LoadKeys()
+
 	envFile := ".env" // Defaults to local dev environment
 
 	err := godotenv.Load(envFile)

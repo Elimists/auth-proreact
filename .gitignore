@@ -7,3 +7,6 @@ app
 .env.production
 .env
 *.db
+*.pem
+*.pub
+keys
