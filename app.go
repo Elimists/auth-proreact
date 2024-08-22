@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/Elimists/go-app/controller"
 	"github.com/Elimists/go-app/database"
 	"github.com/Elimists/go-app/routes"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/joho/godotenv"
 )
 
@@ -50,6 +52,19 @@ func main() {
 	}
 
 	app.Use(cors.New(corsConfig))
+
+	app.Use(csrf.New(csrf.Config{
+		KeyLookup:      "form:_csrf",
+		CookieName:     "csrf_",
+		CookieSameSite: "Strict",
+		Expiration:     60 * time.Minute,
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error":   true,
+				"message": "CSRF token mismatch",
+			})
+		},
+	}))
 
 	routes.AllRoutes(app)
 
