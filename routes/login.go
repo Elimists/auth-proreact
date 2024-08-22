@@ -3,7 +3,9 @@ package routes
 import (
 	"errors"
 	"fmt"
+	"html"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Elimists/go-app/controller"
@@ -17,12 +19,8 @@ import (
 
 func Login(c *fiber.Ctx) error {
 
-	if err := controller.ValidateCSRFToken(c); err != nil {
-		return err
-	}
-
-	email := c.FormValue("email")
-	password := c.FormValue("password")
+	email := html.EscapeString(strings.TrimSpace(c.FormValue("email")))
+	password := html.EscapeString(strings.TrimSpace(c.FormValue("password")))
 
 	if email == "" || password == "" {
 		rp := models.ResponsePacket{Error: true, Code: "empty_fields", Message: "Missing required fields."}
@@ -77,4 +75,5 @@ func Login(c *fiber.Ctx) error {
 
 	rp := models.ResponsePacket{Error: false, Code: "successfull", Message: "Login successfull"}
 	return c.Status(fiber.StatusOK).JSON(rp)
+
 }

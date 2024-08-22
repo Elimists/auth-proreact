@@ -32,12 +32,12 @@ func ValidateCSRFToken(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotAcceptable).JSON(rp)
 	}
 
-	return nil
+	return c.Next()
 }
 
 func InvalidateCSRFToken(c *fiber.Ctx) error {
 	c.Cookie(&fiber.Cookie{
-		Name:     fmt.Sprintf("%s_csrf", os.Getenv("API_NAME")),
+		Name:     "csrf_",
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour), // Set to a past time to expire the cookie
 		Secure:   true,

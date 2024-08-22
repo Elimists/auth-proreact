@@ -8,14 +8,14 @@ import (
 func AllRoutes(app *fiber.App) {
 
 	// Auth routes
+	app.Get("/ping", Ping) // Test route. Also gets csrf token.
 
 	app.Post("/register", middleware.Limiter(14, 60), Register)
 	app.Get("/verify", middleware.Limiter(1, 60), VerifyEmail)
 
-	app.Post("/login", middleware.Limiter(6, 45), Login)
+	//app.Post("/login", middleware.Limiter(6, 45), Login)
+	app.Post("/login", Login)
 	app.Post("/logout", middleware.Limiter(6, 45), Logout)
-
-	app.Get("/csrf", middleware.Limiter(6, 45), CSRFToken)
 
 	app.Post(
 		"/password-reset",
