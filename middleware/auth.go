@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"github.com/Elimists/go-app/controller"
+	"github.com/Elimists/go-app/config"
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v3"
 )
 
 func Protected() func(*fiber.Ctx) error {
 	return jwtware.New(jwtware.Config{
-		SigningKey:   controller.GetPublicKey(),
+		SigningKey:   config.GetPublicKey(),
 		ErrorHandler: jwtError,
 	})
 }
