@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"unicode"
 
+	"github.com/Elimists/go-app/config"
 	"github.com/eapache/channels"
 )
 
@@ -37,9 +38,9 @@ func SendPasswordResetEmail(email string) error {
 
 	smtpPlainAuth := smtp.PlainAuth(
 		"",
-		SMTPUsername,
-		SMTPPassword,
-		SMTPHost,
+		config.GetSMTPUserName(),
+		config.GetSMTPPassword(),
+		config.GetSMTPHost(),
 	)
 
 	to := []string{email}
@@ -100,11 +101,12 @@ func GenerateVerificationCode() string {
 }
 
 func SendVerificationEmail(email string, verificationCode string) error {
+
 	smtpPlainAuth := smtp.PlainAuth(
 		"",
-		SMTPUsername,
-		SMTPPassword,
-		SMTPHost,
+		config.GetSMTPUserName(),
+		config.GetSMTPPassword(),
+		config.GetSMTPHost(),
 	)
 
 	to := []string{email}

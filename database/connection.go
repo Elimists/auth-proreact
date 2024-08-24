@@ -2,8 +2,8 @@ package database
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/Elimists/go-app/config"
 	"github.com/Elimists/go-app/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -17,12 +17,12 @@ func Connect() {
 	var err error
 	var dbConn *gorm.DB
 
-	environment := os.Getenv("ENVIRONMENT")
+	environment := config.GetAPIEnvironment()
 	if environment == "production" {
 		// MySQL connection string
-		user := os.Getenv("DB_USER")
-		password := os.Getenv("DB_PASSWORD")
-		database := os.Getenv("DB_DATABASE")
+		user := config.GetDatabaseUser()
+		password := config.GetDatabasePassword()
+		database := config.GetDatabaseName()
 		stringConn := fmt.Sprintf("%s:%s@/%s?parseTime=true", user, password, database)
 
 		dbConn, err = gorm.Open(mysql.Open(stringConn), &gorm.Config{

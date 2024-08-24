@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Elimists/go-app/controller"
+	"github.com/Elimists/go-app/config"
 	"github.com/Elimists/go-app/database"
 	"github.com/Elimists/go-app/models"
 	"github.com/gofiber/fiber/v2"
@@ -56,7 +56,7 @@ func Login(c *fiber.Ctx) error {
 		"exp":       expiry,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	signedToken, err := token.SignedString(controller.GetPrivateKey())
+	signedToken, err := token.SignedString(config.GetPrivateKey())
 
 	if err != nil {
 		rp := models.ResponsePacket{Error: true, Code: "internal_error", Message: "Could not sign token."}
@@ -66,7 +66,7 @@ func Login(c *fiber.Ctx) error {
 	database.DB.Model(&user).Where("email = ?", email).Update("updated_at", time.Now()) // update the last logged in datetime
 
 	c.Cookie(&fiber.Cookie{
-		Name:     fmt.Sprintf("%s_jwt", controller.APIName),
+		Name:     fmt.Sprintf("%s_jwt", config.GetAPIName()),
 		Value:    signedToken,
 		Expires:  expiry.Time,
 		SameSite: "Lax",
