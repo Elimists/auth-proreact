@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/Elimists/go-app/controller"
@@ -17,14 +16,16 @@ import (
 
 func init() {
 
-	controller.LoadKeys()
-
-	envFile := ".env" // Defaults to local dev environment
+	envFile := ".env"
 
 	err := godotenv.Load(envFile)
 	if err != nil {
 		log.Fatal("Error: " + err.Error())
 	}
+
+	controller.LoadAPIConfig()
+	controller.LoadSMTPConfig()
+	controller.LoadKeys()
 
 	database.Connect()
 	go controller.EmailVerificationWorker() // Start the email verification worker
@@ -37,7 +38,7 @@ func main() {
 	app.Static("/", "./public")
 
 	var corsConfig cors.Config
-	if os.Getenv("ENVIRONMENT") == "production" || os.Getenv("ENVIRONMENT") == "staging" {
+	if controller.APIEnvironment == "production" || controller.APIEnvironment == "staging" {
 		corsConfig = cors.Config{
 			AllowCredentials: true,
 			AllowOrigins:     "http://localhost:3000", // Restrict to localhost:3000 in production
@@ -68,5 +69,5 @@ func main() {
 
 	routes.AllRoutes(app)
 
-	app.Listen(fmt.Sprintf(":%s", os.Getenv("API_PORT")))
+	app.Listen(fmt.Sprintf(":%s", controller.APIPort))
 }

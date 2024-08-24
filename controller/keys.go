@@ -12,35 +12,35 @@ import (
 )
 
 var (
-	privateKey *rsa.PrivateKey
-	publicKey  *rsa.PublicKey
+	PrivateKey *rsa.PrivateKey
+	PublicKey  *rsa.PublicKey
 )
 
 func GetPrivateKey() *rsa.PrivateKey {
-	return privateKey
+	return PrivateKey
 }
 
 func GetPublicKey() *rsa.PublicKey {
-	return publicKey
+	return PublicKey
 }
 
 func LoadKeys() {
-	privateKeyData, err := os.ReadFile("keys/private_key.pem")
+	privateKeyData, err := os.ReadFile(os.Getenv("PRIVATE_KEY_PATH"))
 	if err != nil {
 		log.Fatal("Error reading private key: " + err.Error())
 	}
 
-	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privateKeyData)
+	PrivateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privateKeyData)
 	if err != nil {
 		log.Fatal("Error parsing private key: " + err.Error())
 	}
 
-	publicKeyData, err := os.ReadFile("keys/public_key.pem")
+	publicKeyData, err := os.ReadFile(os.Getenv("PUBLIC_KEY_PATH"))
 	if err != nil {
 		log.Fatal("Error reading public key: " + err.Error())
 	}
 
-	publicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKeyData)
+	PublicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicKeyData)
 	if err != nil {
 		log.Fatal("Error parsing public key: " + err.Error())
 	}

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"html"
-	"os"
 	"strings"
 	"time"
 
@@ -67,7 +66,7 @@ func Login(c *fiber.Ctx) error {
 	database.DB.Model(&user).Where("email = ?", email).Update("updated_at", time.Now()) // update the last logged in datetime
 
 	c.Cookie(&fiber.Cookie{
-		Name:     fmt.Sprintf("%s_jwt", os.Getenv("API_NAME")),
+		Name:     fmt.Sprintf("%s_jwt", controller.APIName),
 		Value:    signedToken,
 		Expires:  expiry.Time,
 		SameSite: "Lax",
