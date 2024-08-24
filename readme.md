@@ -18,6 +18,7 @@ The **JWT Auth Service** is responsible for authenticating users via username an
 - **Framework**: Fiber
 - **Authentication**: JWT (RS256)
 - **Database**:
+  - **ORM: GORM
   - **Development**: SQLite
   - **Production & QA**: MySQL Server
 
