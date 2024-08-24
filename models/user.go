@@ -18,7 +18,6 @@ type User struct {
 	Privilege        int8             `json:"privilege"` // 1: Admin, 2: Manager, 3: Coordinator, 4: Moderator, 9: General user
 	Verified         bool             `json:"-"`
 	UserVerification UserVerification `json:"userVerification" gorm:"constraint:OnDelete:CASCADE;foreignKey:UserID"`
-	UserDetails      UserDetails      `json:"userDetails" gorm:"constraint:OnDelete:CASCADE;foreignkey:UserID"` // One to one relationship with the user details. Delete the user details if the user is deleted.
 }
 
 type UserVerification struct {
@@ -26,37 +25,4 @@ type UserVerification struct {
 	UserID             uint   `json:"-"` // The user ID of the user this verification belongs to.
 	VerificationCode   string `json:"-"`
 	VerificationExpiry uint   `json:"-"`
-}
-
-type UserDetails struct {
-	CustomModel
-	UserID         uint               `json:"-"`                                         // The user ID of the user this verification belongs to.
-	UserEmail      string             `json:"userEmail" gorm:"unique;type:varchar(255)"` // The email address of the user. This is the primary key.
-	FirstName      string             `json:"firstName"`
-	LastName       string             `json:"lastName"`
-	Bio            string             `json:"bio"`
-	Interests      string             `json:"interests"`
-	Organization   string             `json:"organization"` // The organization the user is affiliated with.
-	Occupation     string             `json:"occupation"`
-	Education      string             `json:"education"` // The level of education the user has achieved
-	ProfilePicture UserProfilePicture `json:"profilePicture" gorm:"constraint:OnDelete:CASCADE;foreignkey:UserDetailsID"`
-	Addresses      []UserAddress      `json:"addresses;" gorm:"constraint:OnDelete:CASCADE;foreignkey:UserDetailsID"`
-}
-
-type UserAddress struct {
-	CustomModel
-	UserDetailsID uint   `json:"userDetailsID"` // References the user details id in the UserDetails table.
-	StreetAddress string `json:"streetAddress"`
-	City          string `json:"city"`
-	State         string `json:"state"`
-	ZipCode       string `json:"zipCode"`
-	Country       string `json:"country"`
-	IsActive      bool   `json:"isActive"`
-}
-type UserProfilePicture struct {
-	CustomModel
-	UserDetailsID uint   `json:"userDetailsID"` // References the user details id in the UserDetails table.
-	UrlSafeName   string `json:"urlSafeName"`
-	UserImage     []byte `json:"userImage"`
-	ImageAltText  string `json:"imageAltText"`
 }

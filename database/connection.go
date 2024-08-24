@@ -49,9 +49,6 @@ func Connect() {
 	err = DB.AutoMigrate(
 		&models.User{},
 		&models.UserVerification{},
-		&models.UserDetails{},
-		&models.UserAddress{},
-		&models.UserProfilePicture{},
 	)
 	if err != nil {
 		panic("Could not auto-migrate database: " + err.Error())
