@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"net/smtp"
-	"os"
 	"regexp"
 	"strconv"
 	"unicode"
@@ -34,16 +33,13 @@ func EmailVerificationWorker() {
 	}
 }
 
-/*
- * HELPER FUNCTIONS
- */
 func SendPasswordResetEmail(email string) error {
 
 	smtpPlainAuth := smtp.PlainAuth(
 		"",
-		os.Getenv("SMTP_USERNAME"),
-		os.Getenv("SMTP_PASSWORD"),
-		os.Getenv("SMTP_HOST"),
+		SMTPUsername,
+		SMTPPassword,
+		SMTPHost,
 	)
 
 	to := []string{email}
@@ -106,9 +102,9 @@ func GenerateVerificationCode() string {
 func SendVerificationEmail(email string, verificationCode string) error {
 	smtpPlainAuth := smtp.PlainAuth(
 		"",
-		os.Getenv("SMTP_USERNAME"),
-		os.Getenv("SMTP_PASSWORD"),
-		os.Getenv("SMTP_HOST"),
+		SMTPUsername,
+		SMTPPassword,
+		SMTPHost,
 	)
 
 	to := []string{email}
