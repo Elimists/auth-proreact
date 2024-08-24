@@ -6,6 +6,7 @@ import (
 	"log"
 	"math/rand"
 	"net/smtp"
+	"os"
 	"regexp"
 	"strconv"
 	"unicode"
@@ -38,11 +39,16 @@ func EmailVerificationWorker() {
  */
 func SendPasswordResetEmail(email string) error {
 
-	auth := smtp.PlainAuth("", "231c63d58c7571", "15065dc065bf4c", "sandbox.smtp.mailtrap.io")
+	smtpPlainAuth := smtp.PlainAuth(
+		"",
+		os.Getenv("SMTP_USERNAME"),
+		os.Getenv("SMTP_PASSWORD"),
+		os.Getenv("SMTP_HOST"),
+	)
 
 	to := []string{email}
 	subject := "Subject: Password Reset\n"
-	from := "maker@example.com"
+	from := "no-reply@example.com"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	body := fmt.Sprintf(`
 		<html>
@@ -56,7 +62,7 @@ func SendPasswordResetEmail(email string) error {
 		`)
 	msg := []byte(subject + mime + body)
 
-	err := smtp.SendMail("sandbox.smtp.mailtrap.io:2525", auth, from, to, msg)
+	err := smtp.SendMail("sandbox.smtp.mailtrap.io:2525", smtpPlainAuth, from, to, msg)
 	return err
 }
 
@@ -97,14 +103,17 @@ func GenerateVerificationCode() string {
 	return strconv.Itoa((rand.Intn(max-min+1) + min))
 }
 
-// Send the verification code to the user.
 func SendVerificationEmail(email string, verificationCode string) error {
-	// Set up authentication information.
-	auth := smtp.PlainAuth("", "231c63d58c7571", "15065dc065bf4c", "sandbox.smtp.mailtrap.io")
+	smtpPlainAuth := smtp.PlainAuth(
+		"",
+		os.Getenv("SMTP_USERNAME"),
+		os.Getenv("SMTP_PASSWORD"),
+		os.Getenv("SMTP_HOST"),
+	)
 
 	to := []string{email}
 	subject := "Subject: Verify your email\n"
-	from := "no-reply@proreact.com"
+	from := "no-reply@example.com"
 	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	body := fmt.Sprintf(`
 		<html>
@@ -116,6 +125,6 @@ func SendVerificationEmail(email string, verificationCode string) error {
 		`, verificationCode)
 	msg := []byte(subject + mime + body)
 
-	err := smtp.SendMail("sandbox.smtp.mailtrap.io:2525", auth, from, to, msg)
+	err := smtp.SendMail("sandbox.smtp.mailtrap.io:2525", smtpPlainAuth, from, to, msg)
 	return err
 }
